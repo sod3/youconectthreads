@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import XSvg from "../../../components/svgs/X";
-
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const LoginPage = () => {
 	const [formData, setFormData] = useState({
@@ -23,13 +23,13 @@ const LoginPage = () => {
 	} = useMutation({
 		mutationFn: async ({ username, password }) => {
 			try {
-				const res = await fetch("/api/auth/login", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ username, password }),
-				});
+			  const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+				method: "POST",
+				headers: {
+				  "Content-Type": "application/json",
+				},
+				body: JSON.stringify({ username, password }),
+			  });
 
 				const data = await res.json();
 

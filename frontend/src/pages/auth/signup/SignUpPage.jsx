@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-import XSvg from "../../../components/svgs/X";
-
 import { MdOutlineMail } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const SignUpPage = () => {
 	const [formData, setFormData] = useState({
@@ -23,13 +23,13 @@ const SignUpPage = () => {
 	const { mutate, isError, isPending, error } = useMutation({
 		mutationFn: async ({ email, username, fullName, password }) => {
 			try {
-				const res = await fetch("/api/auth/signup", {
+				const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
 					method: "POST",
 					headers: {
-						"Content-Type": "application/json",
+					  "Content-Type": "application/json",
 					},
 					body: JSON.stringify({ email, username, fullName, password }),
-				});
+				  });
 
 				const data = await res.json();
 				if (!res.ok) throw new Error(data.error || "Failed to create account");
