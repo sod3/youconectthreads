@@ -26,7 +26,9 @@ const __dirname = path.resolve();
 
 // Handle CORS (allow requests from different origins)
 const corsOptions = {
-	origin: ["http://localhost:3000"], // Frontend URL (adjust as needed)
+	origin: ["http://localhost:3000",
+		     "https://youconectthreads.vercel.app",
+	], // Frontend URL (adjust as needed)
 	credentials: true, // Allow cookies and credentials to be sent
 };
 app.use(cors(corsOptions)); // Add this line to enable CORS
