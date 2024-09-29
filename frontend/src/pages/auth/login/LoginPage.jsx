@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { MdOutlineMail, MdPassword } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-domain.com'; // Ensure this is set correctly
-
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     username: "",

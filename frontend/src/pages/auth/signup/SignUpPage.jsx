@@ -5,8 +5,6 @@ import { FaUser } from "react-icons/fa";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-backend-domain.com'; // Set this correctly
-
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: "",
