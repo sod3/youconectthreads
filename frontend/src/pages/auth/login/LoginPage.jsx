@@ -19,32 +19,29 @@ const LoginPage = () => {
     error,
   } = useMutation({
     mutationFn: async ({ username, password }) => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        });
+			try {
+				const res = await fetch("/api/auth/login", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ username, password }),
+				});
 
-        if (!res.ok) {
-          // If the response isn't okay, log the error response
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Login failed");
-        }
+				const data = await res.json();
 
-        const data = await res.json();
-        return data;
-      } catch (error) {
-        console.error("Login Error:", error);
-        throw new Error(error.message || "Login failed");
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-  });
+				if (!res.ok) {
+					throw new Error(data.error || "Something went wrong");
+				}
+			} catch (error) {
+				throw new Error(error);
+			}
+		},
+		onSuccess: () => {
+			// refetch the authUser
+			queryClient.invalidateQueries({ queryKey: ["authUser"] });
+		},
+	});
 
   const handleSubmit = (e) => {
     e.preventDefault();

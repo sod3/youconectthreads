@@ -19,32 +19,33 @@ const SignUpPage = () => {
 
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async ({ email, username, fullName, password }) => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, username, fullName, password }),
-        });
+			try {
+				const res = await fetch("/api/auth/signup", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ email, username, fullName, password }),
+				});
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Failed to create account");
-        }
+				const data = await res.json();
+				if (!res.ok) throw new Error(data.error || "Failed to create account");
+				console.log(data);
+				return data;
+			} catch (error) {
+				console.error(error);
+				throw error;
+			}
+		},
+		onSuccess: () => {
+			toast.success("Account created successfully");
 
-        const data = await res.json();
-        return data;
-      } catch (error) {
-        console.error("Signup Error:", error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast.success("Account created successfully");
-      queryClient.invalidateQueries({ queryKey: ["authUser"] });
-    },
-  });
+			{
+				/* Added this line below, after recording the video. I forgot to add this while recording, sorry, thx. */
+			}
+			queryClient.invalidateQueries({ queryKey: ["authUser"] });
+		},
+	});
 
   const handleSubmit = (e) => {
     e.preventDefault();

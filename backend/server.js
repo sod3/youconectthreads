@@ -3,7 +3,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
-import cors from "cors"; // Add this line
 
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -24,15 +23,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-// Handle CORS (allow requests from different origins)
-const corsOptions = {
-	origin: ["http://localhost:3000",
-		     "https://youconectthreads.vercel.app",
-	], // Frontend URL (adjust as needed)
-	credentials: true, // Allow cookies and credentials to be sent
-};
-app.use(cors(corsOptions)); // Add this line to enable CORS
-
 app.use(express.json({ limit: "5mb" })); // to parse req.body
 // limit shouldn't be too high to prevent DOS
 app.use(express.urlencoded({ extended: true })); // to parse form data(urlencoded)
@@ -44,7 +34,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Serve static files in production
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
