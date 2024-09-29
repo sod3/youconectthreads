@@ -30,7 +30,7 @@ const RightPanel = () => {
 	return (
 		<div className='hidden lg:block my-4 mx-2'>
 			<div className='bg-[#16181C] p-4 rounded-md sticky top-2'>
-				<p className='font-bold'>Who to conect</p> {/* Updated this line */}
+				<p className='font-bold'>Who to follow</p>
 				<div className='flex flex-col gap-4'>
 					{/* item */}
 					{isLoading && (
@@ -69,7 +69,7 @@ const RightPanel = () => {
 											follow(user._id);
 										}}
 									>
-										{isPending ? <LoadingSpinner size='sm' /> : "Conect"}
+										{isPending ? <LoadingSpinner size='sm' /> : "Follow"}
 									</button>
 								</div>
 							</Link>
