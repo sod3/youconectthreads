@@ -15,7 +15,6 @@ import LoadingSpinner from "./components/common/LoadingSpinner";
 
 function App() {
 	const { data: authUser, isLoading } = useQuery({
-		// we use queryKey to give a unique name to our query and refer to it later
 		queryKey: ["authUser"],
 		queryFn: async () => {
 			try {
@@ -25,7 +24,6 @@ function App() {
 				if (!res.ok) {
 					throw new Error(data.error || "Something went wrong");
 				}
-				console.log("authUser is here:", data);
 				return data;
 			} catch (error) {
 				throw new Error(error);
@@ -44,16 +42,21 @@ function App() {
 
 	return (
 		<div className='flex max-w-6xl mx-auto'>
-			{/* Common component, bc it's not wrapped with Routes */}
-			{authUser && <Sidebar />}
+			{/* Show Sidebar and RightPanel only for authenticated users */}
+			{<Sidebar />}
 			<Routes>
-				<Route path='/' element={authUser ? <HomePage /> : <Navigate to='/login' />} />
+				{/* Show homepage regardless of authentication */}
+				<Route path='/' element={<HomePage />} />
+
+				{/* Login and SignUp should not be accessible when logged in */}
 				<Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to='/' />} />
 				<Route path='/signup' element={!authUser ? <SignUpPage /> : <Navigate to='/' />} />
+
+				{/* Protected routes */}
 				<Route path='/notifications' element={authUser ? <NotificationPage /> : <Navigate to='/login' />} />
 				<Route path='/profile/:username' element={authUser ? <ProfilePage /> : <Navigate to='/login' />} />
 			</Routes>
-			{authUser && <RightPanel />}
+			{<RightPanel />}
 			<Toaster />
 		</div>
 	);

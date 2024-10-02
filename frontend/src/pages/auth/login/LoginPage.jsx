@@ -58,7 +58,8 @@ const LoginPage = () => {
       <div className='flex-1 flex flex-col justify-center items-center'>
         <form className='flex gap-4 flex-col' onSubmit={handleSubmit}>
           <img src="/youconect.png" alt="Logo" className='w-24 lg:hidden' />
-          <h1 className='text-4xl font-extrabold text-white'>{"Let's"} go.</h1>
+          <h1 className='text-5xl font-extrabold text-white'>{"Let's"} go.</h1>
+          <h2 className='text-2xl font-semibold text-white/70'>login to create post and conect with the world</h2>
           <label className='input input-bordered rounded flex items-center gap-2'>
             <MdOutlineMail />
             <input

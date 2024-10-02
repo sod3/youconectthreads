@@ -7,7 +7,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
 
@@ -16,9 +15,12 @@ const Post = ({ post }) => {
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 	const queryClient = useQueryClient();
 	const postOwner = post.user;
-	const isLiked = post.likes.includes(authUser._id);
 
-	const isMyPost = authUser._id === post.user._id;
+	// Only check if liked if authUser is defined
+	const isLiked = authUser ? post.likes.includes(authUser._id) : false;
+
+	// Check if it's my post only if authUser is defined
+	const isMyPost = authUser ? authUser._id === post.user._id : false;
 
 	const formattedDate = formatPostDate(post.createdAt);
 
@@ -29,7 +31,6 @@ const Post = ({ post }) => {
 					method: "DELETE",
 				});
 				const data = await res.json();
-
 				if (!res.ok) {
 					throw new Error(data.error || "Something went wrong");
 				}
@@ -60,10 +61,6 @@ const Post = ({ post }) => {
 			}
 		},
 		onSuccess: (updatedLikes) => {
-			// this is not the best UX, bc it will refetch all posts
-			// queryClient.invalidateQueries({ queryKey: ["posts"] });
-
-			// instead, update the cache directly for that post
 			queryClient.setQueryData(["posts"], (oldData) => {
 				return oldData.map((p) => {
 					if (p._id === post._id) {
@@ -109,16 +106,28 @@ const Post = ({ post }) => {
 	});
 
 	const handleDeletePost = () => {
+		if (!authUser) {
+			toast.error("You need to be logged in to delete posts.");
+			return;
+		}
 		deletePost();
 	};
 
 	const handlePostComment = (e) => {
 		e.preventDefault();
+		if (!authUser) {
+			toast.error("You need to be logged in to comment.");
+			return;
+		}
 		if (isCommenting) return;
 		commentPost();
 	};
 
 	const handleLikePost = () => {
+		if (!authUser) {
+			toast.error("You need to be logged in to like posts.");
+			return;
+		}
 		if (isLiking) return;
 		likePost();
 	};
@@ -146,7 +155,6 @@ const Post = ({ post }) => {
 								{!isDeleting && (
 									<FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />
 								)}
-
 								{isDeleting && <LoadingSpinner size='sm' />}
 							</span>
 						)}
@@ -172,7 +180,6 @@ const Post = ({ post }) => {
 									{post.comments.length}
 								</span>
 							</div>
-							{/* We're using Modal Component from DaisyUI */}
 							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
 								<div className='modal-box rounded border border-gray-600'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
@@ -221,7 +228,7 @@ const Post = ({ post }) => {
 								<form method='dialog' className='modal-backdrop'>
 									<button className='outline-none'>close</button>
 								</form>
-							</dialog>
+							</dialog>					
 							<div className='flex gap-1 items-center group cursor-pointer'>
 								<BiRepost className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
