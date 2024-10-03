@@ -3,6 +3,14 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+// Helper function to shuffle posts
+const shufflePosts = (posts) => {
+	return posts
+		.map((post) => ({ post, sort: Math.random() }))
+		.sort((a, b) => a.sort - b.sort)
+		.map(({ post }) => post);
+};
+
 const Posts = ({ feedType, username, userId }) => {
 	const getPostEndpoint = () => {
 		switch (feedType) {
@@ -37,7 +45,8 @@ const Posts = ({ feedType, username, userId }) => {
 					throw new Error(data.error || "Something went wrong");
 				}
 
-				return data;
+				// Shuffle posts before returning them
+				return shufflePosts(data);
 			} catch (error) {
 				throw new Error(error);
 			}

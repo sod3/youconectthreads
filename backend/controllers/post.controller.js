@@ -64,19 +64,22 @@ export const commentOnPost = async (req, res) => {
 	try {
 		const { text } = req.body;
 		const postId = req.params.id;
-		const userId = req.user._id;
+		const userId = req.user ? req.user._id : null;
+
+		if (!userId) {
+			return res.status(401).json({ error: "User is not authenticated" });
+		}
 
 		if (!text) {
 			return res.status(400).json({ error: "Text field is required" });
 		}
-		const post = await Post.findById(postId);
 
+		const post = await Post.findById(postId);
 		if (!post) {
 			return res.status(404).json({ error: "Post not found" });
 		}
 
 		const comment = { user: userId, text };
-
 		post.comments.push(comment);
 		await post.save();
 
@@ -86,6 +89,7 @@ export const commentOnPost = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+
 
 export const likeUnlikePost = async (req, res) => {
 	try {

@@ -4,8 +4,10 @@ import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import Picker from '@emoji-mart/react';
 
 const CreatePost = () => {
+	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [text, setText] = useState("");
 	const [img, setImg] = useState(null);
 	const imgRef = useRef(null);
@@ -62,6 +64,10 @@ const CreatePost = () => {
 		}
 	};
 
+	const addEmoji = (emoji) => {
+		setText(text + emoji.native);
+	};
+
 	return (
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>
@@ -95,8 +101,24 @@ const CreatePost = () => {
 							className='fill-primary w-6 h-6 cursor-pointer'
 							onClick={() => imgRef.current.click()}
 						/>
-						<BsEmojiSmileFill className='fill-primary w-5 h-5 cursor-pointer' />
+						<BsEmojiSmileFill
+							className="fill-primary w-5 h-5 cursor-pointer"
+							onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+						/>
 					</div>
+
+					{showEmojiPicker && (
+						<div className="absolute z-50 bg-gray-800 p-2 rounded">
+							<div className="flex justify-end">
+								<IoCloseSharp
+									className="text-white bg-gray-700 rounded-full w-5 h-5 cursor-pointer"
+									onClick={() => setShowEmojiPicker(false)}
+								/>
+							</div>
+							<Picker onEmojiSelect={addEmoji} />
+						</div>
+					)}
+
 					<input type='file' accept='image/*' hidden ref={imgRef} onChange={handleImgChange} />
 					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
 						{isPending ? "Posting..." : "Post"}
@@ -107,4 +129,5 @@ const CreatePost = () => {
 		</div>
 	);
 };
+
 export default CreatePost;

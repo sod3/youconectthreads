@@ -10,8 +10,12 @@ import { toast } from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
 
+
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
+	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+	const [selectedImage, setSelectedImage] = useState("");
+	
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 	const queryClient = useQueryClient();
 	const postOwner = post.user;
@@ -132,6 +136,16 @@ const Post = ({ post }) => {
 		likePost();
 	};
 
+	const handleImageClick = (imgSrc) => {
+		setSelectedImage(imgSrc);
+		setIsImageModalOpen(true);
+	};
+
+	// Handle modal close
+	const closeModal = () => {
+		setIsImageModalOpen(false);
+		setSelectedImage("");
+	};
 	return (
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
@@ -164,8 +178,9 @@ const Post = ({ post }) => {
 						{post.img && (
 							<img
 								src={post.img}
-								className='h-80 object-contain rounded-lg border border-gray-700'
-								alt=''
+								className='h-80 object-contain rounded-lg border border-gray-700 cursor-pointer'
+								alt='Post Image'
+								onClick={() => handleImageClick(post.img)} // Add click handler
 							/>
 						)}
 					</div>
@@ -173,7 +188,7 @@ const Post = ({ post }) => {
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
 								className='flex gap-1 items-center cursor-pointer group'
-								onClick={() => document.getElementById("comments_modal" + post._id).showModal()}
+								onClick={() => document.getElementById(`comments_modal${post._id}`).showModal()}
 							>
 								<FaRegComment className='w-4 h-4  text-slate-500 group-hover:text-sky-400' />
 								<span className='text-sm text-slate-500 group-hover:text-sky-400'>
@@ -256,8 +271,32 @@ const Post = ({ post }) => {
 						</div>
 					</div>
 				</div>
+				
 			</div>
+
+			{/* Modal for image magnification */}
+			{isImageModalOpen && (
+				<div
+					className='fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50'
+					onClick={closeModal}
+				>
+					<div className='relative'>
+						<img
+							src={selectedImage}
+							className='max-w-full max-h-screen object-contain rounded-lg'
+							alt='Magnified Image'
+						/>
+						<button
+							className='absolute top-2 right-2 text-white text-2xl'
+							onClick={closeModal}
+						>
+							&times;
+						</button>
+					</div>
+				</div>
+			)}
 		</>
 	);
 };
+
 export default Post;
