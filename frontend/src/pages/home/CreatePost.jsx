@@ -107,27 +107,35 @@ const CreatePost = () => {
 						/>
 					</div>
 
-					{showEmojiPicker && (
-						<div className="absolute z-50 bg-gray-800 p-2 rounded">
-							<div className="flex justify-end">
-								<IoCloseSharp
-									className="text-white bg-gray-700 rounded-full w-5 h-5 cursor-pointer"
-									onClick={() => setShowEmojiPicker(false)}
-								/>
-							</div>
-							<Picker onEmojiSelect={addEmoji} />
-						</div>
-					)}
-
-					<input type='file' accept='image/*' hidden ref={imgRef} onChange={handleImgChange} />
-					<button className='btn btn-primary rounded-full btn-sm text-white px-4'>
-						{isPending ? "Posting..." : "Post"}
-					</button>
-				</div>
-				{isError && <div className='text-red-500'>{error.message}</div>}
-			</form>
-		</div>
-	);
+                    {showEmojiPicker && (
+                        <div
+                            className="absolute z-50 bg-white border rounded"
+                            style={{
+                                bottom: "250px",
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                width: "100%",
+                                maxWidth: "320px",
+                            }}
+                        >
+                            <div className="flex justify-end p-1">
+                                <IoCloseSharp
+                                    className="w-5 h-5 cursor-pointer text-gray-500"
+                                    onClick={() => setShowEmojiPicker(false)}
+                                />
+                            </div>
+                            <Picker onEmojiSelect={addEmoji} />
+                        </div>
+                    )}
+                    <input type="file" accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
+                    <button className="btn btn-primary rounded-full btn-sm text-white px-4">
+                        {isPending ? "Posting..." : "Post"}
+                    </button>
+                </div>
+                {isError && <div className="text-red-500">{error.message}</div>}
+            </form>
+        </div>
+    );
 };
 
 export default CreatePost;

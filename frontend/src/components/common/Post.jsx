@@ -31,6 +31,7 @@ const Post = ({ post }) => {
 	const { mutate: deletePost, isPending: isDeleting } = useMutation({
 		mutationFn: async () => {
 			try {
+
 				const res = await fetch(`/api/posts/${post._id}`, {
 					method: "DELETE",
 				});
@@ -52,6 +53,7 @@ const Post = ({ post }) => {
 	const { mutate: likePost, isPending: isLiking } = useMutation({
 		mutationFn: async () => {
 			try {
+
 				const res = await fetch(`/api/posts/like/${post._id}`, {
 					method: "POST",
 				});
@@ -82,6 +84,7 @@ const Post = ({ post }) => {
 	const { mutate: commentPost, isPending: isCommenting } = useMutation({
 		mutationFn: async () => {
 			try {
+
 				const res = await fetch(`/api/posts/comment/${post._id}`, {
 					method: "POST",
 					headers: {
@@ -150,16 +153,19 @@ const Post = ({ post }) => {
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
 				<div className='avatar'>
+
 					<Link to={`/profile/${postOwner.username}`} className='w-8 rounded-full overflow-hidden'>
 						<img src={postOwner.profileImg || "/avatar-placeholder.png"} />
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
 					<div className='flex gap-2 items-center'>
+
 						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
 							{postOwner.fullName}
 						</Link>
 						<span className='text-gray-700 flex gap-1 text-sm'>
+
 							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
 							<span>·</span>
 							<span>{formattedDate}</span>
@@ -188,6 +194,7 @@ const Post = ({ post }) => {
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
 								className='flex gap-1 items-center cursor-pointer group'
+
 								onClick={() => document.getElementById(`comments_modal${post._id}`).showModal()}
 							>
 								<FaRegComment className='w-4 h-4  text-slate-500 group-hover:text-sky-400' />
@@ -195,6 +202,7 @@ const Post = ({ post }) => {
 									{post.comments.length}
 								</span>
 							</div>
+
 							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
 								<div className='modal-box rounded border border-gray-600'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
@@ -258,8 +266,10 @@ const Post = ({ post }) => {
 								)}
 
 								<span
+
 									className={`text-sm  group-hover:text-pink-500 ${
 										isLiked ? "text-pink-500" : "text-slate-500"
+
 									}`}
 								>
 									{post.likes.length}
@@ -290,13 +300,14 @@ const Post = ({ post }) => {
 							className='absolute top-2 right-2 text-white text-2xl'
 							onClick={closeModal}
 						>
-							&times;
+
+							×
 						</button>
 					</div>
 				</div>
 			)}
 		</>
 	);
-};
 
+};
 export default Post;
