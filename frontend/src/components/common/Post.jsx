@@ -1,21 +1,43 @@
 import { FaRegComment } from "react-icons/fa";
-import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
+import { BiShareAlt } from "react-icons/bi";
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
 import { formatPostDate } from "../../utils/date";
+import {
+	WhatsappShareButton,
+	FacebookShareButton,
+	TwitterShareButton,
+	WhatsappIcon,
+	FacebookIcon,
+	TwitterIcon,
+  } from "react-share";
+import styled from "styled-components";
 
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0; /* Space around the icons */
+`;
+
+const ShareButton = styled.div`
+  margin-right: 15px; /* Increase space between buttons */
+  font-size: 32px; /* Adjust icon size */
+  cursor: pointer;
+`;
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 	const [selectedImage, setSelectedImage] = useState("");
-	
+	const [showShareModal, setShowShareModal] = useState(false); // State to toggle share modal
+
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 	const queryClient = useQueryClient();
 	const postOwner = post.user;
@@ -149,6 +171,11 @@ const Post = ({ post }) => {
 		setIsImageModalOpen(false);
 		setSelectedImage("");
 	};
+	const handleSharePost = () => {
+		setShowShareModal(!showShareModal); // Toggle share modal visibility
+	};
+
+	const postUrl = `https://youconect.com/posts/${post._id}`; 
 	return (
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
@@ -253,7 +280,7 @@ const Post = ({ post }) => {
 								</form>
 							</dialog>					
 							<div className='flex gap-1 items-center group cursor-pointer'>
-								<BiRepost className='w-6 h-6  text-slate-500 group-hover:text-green-500' />
+								<BiShareAlt className='w-6 h-6 text-slate-500 cursor-pointer' onClick={handleSharePost} />
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
@@ -306,8 +333,50 @@ const Post = ({ post }) => {
 					</div>
 				</div>
 			)}
-		</>
-	);
-
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className='fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50'>
+          <div className='bg-white p-4 rounded shadow-lg'>
+            <h3 className='font-bold text-lg mb-4'>Share this post</h3>
+            <IconContainer>
+              <ShareButton>
+                <WhatsappShareButton
+                  url={postUrl}
+                  title={post.text}
+                  separator=":: "
+                >
+                  <WhatsappIcon size={32} round={true} />
+                </WhatsappShareButton>
+              </ShareButton>
+              <ShareButton>
+                <FacebookShareButton
+                  url={postUrl}
+                  quote={post.text}
+                  hashtag="#YouConect"
+                >
+                  <FacebookIcon size={32} round={true} />
+                </FacebookShareButton>
+              </ShareButton>
+              <ShareButton>
+                <TwitterShareButton
+                  url={postUrl}
+                  title={post.text}
+                >
+                  <TwitterIcon size={32} round={true} />
+                </TwitterShareButton>
+              </ShareButton>
+            </IconContainer>
+            <button
+              className='mt-4 text-red-600'
+              onClick={handleSharePost} // Close share modal
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
+
 export default Post;
