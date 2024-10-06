@@ -174,6 +174,7 @@ const Post = ({ post }) => {
 	const handleSharePost = () => {
 		setShowShareModal(!showShareModal); // Toggle share modal visibility
 	};
+	
 
 	const postUrl = `https://youconect.com/posts/${post._id}`; 
 	return (
@@ -206,17 +207,18 @@ const Post = ({ post }) => {
 							</span>
 						)}
 					</div>
-					<div className='flex flex-col gap-3 overflow-hidden'>
-						<span>{post.text}</span>
-						{post.img && (
-							<img
-								src={post.img}
-								className='h-80 object-contain rounded-lg border border-gray-700 cursor-pointer'
-								alt='Post Image'
-								onClick={() => handleImageClick(post.img)} // Add click handler
-							/>
-						)}
-					</div>
+                    {/* Wrap post text and image in a Link to navigate to the PostDetail page */}
+                    <Link to={`/posts/${post._id}`} className="flex flex-col gap-3 overflow-hidden">
+                        <span>{post.text}</span>
+                        {post.img && (
+                            <img
+                                src={post.img}
+                                className='h-80 object-contain rounded-lg border border-gray-700 cursor-pointer'
+                                alt='Post Image'
+                                onClick={() => handleImageClick(post.img)} // Add click handler for modal image
+                            />
+                        )}
+                    </Link>
 					<div className='flex justify-between mt-3'>
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
@@ -281,7 +283,6 @@ const Post = ({ post }) => {
 							</dialog>					
 							<div className='flex gap-1 items-center group cursor-pointer'>
 								<BiShareAlt className='w-6 h-6 text-slate-500 cursor-pointer' onClick={handleSharePost} />
-								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
 								{isLiking && <LoadingSpinner size='sm' />}

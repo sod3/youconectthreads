@@ -254,4 +254,45 @@ export const getPostById = async (req, res) => {
 	  res.status(500).json({ error: "Internal server error" });
 	}
   };
+  export const getRelatedPosts = async (req, res) => {
+	const { id } = req.params;
+  
+	try {
+	  // Fetch the current post
+	  const currentPost = await Post.findById(id);
+	  if (!currentPost) {
+		return res.status(404).json({ message: 'Post not found' });
+	  }
+  
+	  let relatedPosts = [];
+  
+	  // Find related posts based on tags if available
+	  if (currentPost.tags && currentPost.tags.length > 0) {
+		relatedPosts = await Post.find({
+		  _id: { $ne: currentPost._id }, // Exclude the current post
+		  tags: { $in: currentPost.tags }, // Match posts that share tags
+		})
+		  .limit(5)
+		  .populate('user', 'username profileImg');
+	  }
+  
+	  // If no related posts found, fetch random posts as a fallback
+	  if (relatedPosts.length === 0) {
+		relatedPosts = await Post.aggregate([
+		  { $match: { _id: { $ne: currentPost._id } } }, // Exclude the current post
+		  { $sample: { size: 5 } }, // Get 5 random posts
+		]);
+		
+		// Populate random posts with user data
+		for (let post of relatedPosts) {
+		  post.user = await User.findById(post.user).select('username profileImg');
+		}
+	  }
+  
+	  res.status(200).json(relatedPosts);
+	} catch (error) {
+	  console.error('Error fetching related posts:', error);  // Detailed error logging
+	  res.status(500).json({ message: 'Server error', error: error.message });
+	}
+  };
   

@@ -34,14 +34,13 @@ const Sidebar = () => {
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
   return (
-    <div>
-      {/* Wrapper div for large screens */}
-      <div className='hidden md:flex md:flex-[2_2_0] w-18 max-w-52'>
-        <div className='sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full'>
+    <div className="flex">
+      {/* Sidebar for large screens */}
+      <div className="hidden md:flex md:w-64">
+        <div className="fixed top-0 left-0 h-screen w-64 bg-black border-r border-gray-200">
           <SidebarContent authUser={authUser} logout={logout} />
         </div>
       </div>
-
       {/* Wrapper div for small screens (bottom fixed position) */}
       <div className='fixed md:hidden bottom-0 left-0 right-0 flex justify-around bg-black p-2 border-t border-gray-700'>
         <Link to='/'>

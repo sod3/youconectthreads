@@ -10,6 +10,7 @@ import {
 	getUserPosts,
 	likeUnlikePost,
 	getPostById,
+	getRelatedPosts,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();
@@ -23,5 +24,6 @@ router.post("/like/:id", protectRoute, likeUnlikePost);
 router.post("/comment/:id", protectRoute, commentOnPost);
 router.delete("/:id", protectRoute, deletePost);
 router.get("/:id", getPostById); // Add this line to handle fetching individual posts
+router.get('/related/:id', getRelatedPosts);
 
 export default router;
