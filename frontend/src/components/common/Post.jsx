@@ -175,7 +175,9 @@ const Post = ({ post }) => {
 		setShowShareModal(!showShareModal); // Toggle share modal visibility
 	};
 	
-
+	const getFirstTenLetters = (text) => {
+		return text.slice(0, 10) + (text.length > 10 ? "..." : "");
+	  };
 	const postUrl = `https://youconect.com/posts/${post._id}`; 
 	return (
 		<>
@@ -339,34 +341,36 @@ const Post = ({ post }) => {
         <div className='fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50'>
           <div className='bg-white p-4 rounded shadow-lg'>
             <h3 className='font-bold text-lg mb-4'>Share this post</h3>
-            <IconContainer>
-              <ShareButton>
-                <WhatsappShareButton
-                  url={postUrl}
-                  title={post.text}
-                  separator=":: "
-                >
-                  <WhatsappIcon size={32} round={true} />
-                </WhatsappShareButton>
-              </ShareButton>
-              <ShareButton>
-                <FacebookShareButton
-                  url={postUrl}
-                  quote={post.text}
-                  hashtag="#YouConect"
-                >
-                  <FacebookIcon size={32} round={true} />
-                </FacebookShareButton>
-              </ShareButton>
-              <ShareButton>
-                <TwitterShareButton
-                  url={postUrl}
-                  title={post.text}
-                >
-                  <TwitterIcon size={32} round={true} />
-                </TwitterShareButton>
-              </ShareButton>
-            </IconContainer>
+           <IconContainer>
+             <ShareButton>
+               <WhatsappShareButton
+                 url={postUrl}
+                 title={getFirstTenLetters(post.text)}
+                 separator=":: "
+               >
+                 <WhatsappIcon size={32} round={true} />
+               </WhatsappShareButton>
+             </ShareButton>
+           
+             <ShareButton>
+               <FacebookShareButton
+                 url={postUrl}
+                 quote={getFirstTenLetters(post.text)}
+                 hashtag="#YouConect"
+               >
+                 <FacebookIcon size={32} round={true} />
+               </FacebookShareButton>
+             </ShareButton>
+           
+             <ShareButton>
+               <TwitterShareButton
+                 url={postUrl}
+                 title={getFirstTenLetters(post.text)}
+               >
+                 <TwitterIcon size={32} round={true} />
+               </TwitterShareButton>
+             </ShareButton>
+           </IconContainer>
             <button
               className='mt-4 text-red-600'
               onClick={handleSharePost} // Close share modal

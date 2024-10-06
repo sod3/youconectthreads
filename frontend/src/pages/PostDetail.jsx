@@ -120,8 +120,12 @@ const PostDetail = () => {
   if (error || relatedError) {
     return <div>{error?.message || relatedError?.message}</div>;
   }
-
+	const getFirstTenLetters = (text) => {
+		return text.slice(0, 10) + (text.length > 10 ? "..." : "");
+	  };
   const postUrl = `https://youconect.com/posts/${post._id}`;
+  const currentUrl = window.location.href;
+
   return (
     <Box sx={{ maxWidth: 800, margin: 'auto', padding: '20px' }}>
       <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
@@ -181,22 +185,35 @@ const PostDetail = () => {
                 <div className='bg-white p-4 rounded shadow-lg'>
                     <h3 className='font-bold text-lg mb-4'>Share this post</h3>
                     <IconContainer>
-                        <ShareButton>
-                            <WhatsappShareButton url={postUrl} title={post.text}>
-                                <WhatsappIcon size={32} round={true} />
-                            </WhatsappShareButton>
-                        </ShareButton>
-                        <ShareButton>
-                            <FacebookShareButton url={postUrl} quote={post.text}>
-                                <FacebookIcon size={32} round={true} />
-                            </FacebookShareButton>
-                        </ShareButton>
-                        <ShareButton>
-                            <TwitterShareButton url={postUrl} title={post.text}>
-                                <TwitterIcon size={32} round={true} />
-                            </TwitterShareButton>
-                        </ShareButton>
-                    </IconContainer>
+             <ShareButton>
+               <WhatsappShareButton
+                 url={postUrl}
+                 title={getFirstTenLetters(post.text)}
+                 separator=":: "
+               >
+                 <WhatsappIcon size={32} round={true} />
+               </WhatsappShareButton>
+             </ShareButton>
+           
+             <ShareButton>
+               <FacebookShareButton
+                 url={postUrl}
+                 quote={getFirstTenLetters(post.text)}
+                 hashtag="#YouConect"
+               >
+                 <FacebookIcon size={32} round={true} />
+               </FacebookShareButton>
+             </ShareButton>
+           
+             <ShareButton>
+               <TwitterShareButton
+                 url={currentUrl}
+                 title={getFirstTenLetters(post.text)}
+               >
+                 <TwitterIcon size={32} round={true} />
+               </TwitterShareButton>
+             </ShareButton>
+           </IconContainer>
                     <button className='mt-4 px-4 py-2 bg-blue-500 text-white rounded' onClick={handleSharePost}>
                         Close
                     </button>
@@ -246,39 +263,48 @@ const PostDetail = () => {
       </Card>
 
 
-      {/* Related Posts Section */}
-      <Card sx={{ marginTop: '20px', boxShadow: 3, borderRadius: 2 }}>
-        <CardContent>
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>Related Posts</Typography>
-          {relatedPosts && relatedPosts.length > 0 ? (
-            relatedPosts.map((relatedPost) => (
-              <Link key={relatedPost._id} to={`/posts/${relatedPost._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Card sx={{ marginBottom: '50px', boxShadow: 1 }}>
-                  <CardContent sx={{ display: 'flex', alignItems: 'center', }}>
-                    <div className='avatar'>
-                      <Link to={`/profile/${relatedPost.user.username}`} className='w-12 rounded-full overflow-hidden'>
-                        <img src={relatedPost.user.profileImg || "/avatar-placeholder.png"} className='w-full h-full object-cover' />
-                      </Link>
-                    </div>
-                    <Box>
-                      <Typography variant="h6">{relatedPost.user.username}</Typography>
-                      <Typography variant="body2" color="textSecondary">{relatedPost.user.username}</Typography>
-                    </Box>
-                  </CardContent>
-                  {relatedPost.img && (
-                    <CardMedia component="img" image={relatedPost.img} alt="Related Post Image" sx={{ maxHeight: 700, objectFit: 'scale-down' }} />
-                  )}
-                  <CardContent>
-                    <Typography variant="body1">{relatedPost.text}</Typography>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))
-          ) : (
-            <Typography variant="body2" color="textSecondary">No related posts found.</Typography>
-          )}
-        </CardContent>
-      </Card>
+{/* Related Posts Section */}
+<Card sx={{ marginTop: '20px', boxShadow: 3, borderRadius: 2 }}>
+  <CardContent>
+    <Typography 
+      variant="h6" 
+      sx={{ 
+        marginBottom: '10px', 
+        fontWeight: 'bold',   // Makes the text bold
+        textAlign: 'center'   // Centers the text
+      }}
+    >
+      Related Posts
+    </Typography>
+    {relatedPosts && relatedPosts.length > 0 ? (
+      relatedPosts.map((relatedPost) => (
+        <Link key={relatedPost._id} to={`/posts/${relatedPost._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Card sx={{ marginBottom: '50px', boxShadow: 1 }}>
+            <CardContent sx={{ display: 'flex', alignItems: 'center', }}>
+              <div className='avatar'>
+                <Link to={`/profile/${relatedPost.user.username}`} className='w-12 rounded-full overflow-hidden'>
+                  <img src={relatedPost.user.profileImg || "/avatar-placeholder.png"} className='w-full h-full object-cover' />
+                </Link>
+              </div>
+              <Box>
+                <Typography variant="h6">{relatedPost.user.username}</Typography>
+                <Typography variant="body2" color="textSecondary">{relatedPost.user.username}</Typography>
+              </Box>
+            </CardContent>
+            {relatedPost.img && (
+              <CardMedia component="img" image={relatedPost.img} alt="Related Post Image" sx={{ maxHeight: 700, objectFit: 'scale-down' }} />
+            )}
+            <CardContent>
+              <Typography variant="body1">{relatedPost.text}</Typography>
+            </CardContent>
+          </Card>
+        </Link>
+      ))
+    ) : (
+      <Typography variant="body2" color="textSecondary">No related posts found.</Typography>
+    )}
+  </CardContent>
+</Card>
     </Box>
   );
 };

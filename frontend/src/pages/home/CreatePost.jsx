@@ -77,7 +77,7 @@ const CreatePost = () => {
 			</div>
 			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
 				<textarea
-					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
+					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none border-gray-800'
 					placeholder='What is happening?!'
 					value={text}
 					onChange={(e) => setText(e.target.value)}
@@ -96,46 +96,51 @@ const CreatePost = () => {
 				)}
 
 				<div className='flex justify-between border-t py-2 border-t-gray-700'>
-					<div className='flex gap-1 items-center'>
+					<div className='flex gap-1 items-center relative'>
 						<CiImageOn
 							className='fill-primary w-6 h-6 cursor-pointer'
 							onClick={() => imgRef.current.click()}
 						/>
-						<BsEmojiSmileFill
-							className="fill-primary w-5 h-5 cursor-pointer"
-							onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-						/>
+						
+						{/* Emoji Picker Toggle and Positioning */}
+						<div className="relative">
+							<BsEmojiSmileFill
+								className="fill-primary w-5 h-5 cursor-pointer"
+								onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+							/>
+							
+							{showEmojiPicker && (
+								<div
+									className="absolute z-50 bg-white border rounded shadow"
+									style={{
+										top: "40px", // Ensure this value is enough to display below the icon
+										left: "calc(50% - 30px)", // Move it 25px to the left
+										transform: "translateX(0)",
+										width: "300px",
+										maxWidth: "100%",
+									}}
+								>
+									<div className="flex justify-end p-1">
+										<IoCloseSharp
+											className="w-5 h-5 cursor-pointer text-gray-500"
+											onClick={() => setShowEmojiPicker(false)}
+										/>
+									</div>
+									<Picker onEmojiSelect={addEmoji} />
+								</div>
+							)}
+						</div>
 					</div>
 
-                    {showEmojiPicker && (
-                        <div
-                            className="absolute z-50 bg-white border rounded"
-                            style={{
-                                bottom: "250px",
-                                left: "50%",
-                                transform: "translateX(-50%)",
-                                width: "100%",
-                                maxWidth: "320px",
-                            }}
-                        >
-                            <div className="flex justify-end p-1">
-                                <IoCloseSharp
-                                    className="w-5 h-5 cursor-pointer text-gray-500"
-                                    onClick={() => setShowEmojiPicker(false)}
-                                />
-                            </div>
-                            <Picker onEmojiSelect={addEmoji} />
-                        </div>
-                    )}
-                    <input type="file" accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
-                    <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-                        {isPending ? "Posting..." : "Post"}
-                    </button>
-                </div>
-                {isError && <div className="text-red-500">{error.message}</div>}
-            </form>
-        </div>
-    );
+					<input type="file" accept="image/*" hidden ref={imgRef} onChange={handleImgChange} />
+					<button className="btn btn-primary rounded-full btn-sm text-white px-4">
+						{isPending ? "Posting..." : "Post"}
+					</button>
+				</div>
+				{isError && <div className="text-red-500">{error.message}</div>}
+			</form>
+		</div>
+	);
 };
 
 export default CreatePost;
