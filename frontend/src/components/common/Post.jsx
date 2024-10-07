@@ -32,6 +32,22 @@ const ShareButton = styled.div`
   cursor: pointer;
 `;
 
+const AdComponent = () => (
+	<div className="my-4">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6561467807135376"
+     crossorigin="anonymous"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-6561467807135376"
+     data-ad-slot="7561831875"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+);
+
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -221,6 +237,9 @@ const Post = ({ post }) => {
                             />
                         )}
                     </Link>
+					{/* Insert AdComponent randomly between posts */}
+					  {index % 5 === 0 && <AdComponent />}
+
 					<div className='flex justify-between mt-3'>
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
