@@ -33,7 +33,7 @@ const ShareButton = styled.div`
   cursor: pointer;
 `;
 
-const Post = ({ post }) => {
+const Post = ({ post, index }) => {
 	const [comment, setComment] = useState("");
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 	const [selectedImage, setSelectedImage] = useState("");

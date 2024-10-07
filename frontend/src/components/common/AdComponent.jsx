@@ -1,19 +1,20 @@
 // src/components/common/AdComponent.jsx
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const AdComponent = () => {
+  const adRef = useRef(null); // Ref to track the ad element
+
   useEffect(() => {
-    try {
-      if (window.adsbygoogle) {
+    if (adRef.current) {
+      // Check if the ad is already populated
+      if (!adRef.current.querySelector('.adsbygoogle')) {
         window.adsbygoogle.push({});
       }
-    } catch (e) {
-      console.error("Adsbygoogle push error:", e);
     }
   }, []);
 
   return (
-    <div className="my-4">
+    <div className="my-4" ref={adRef}>
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
