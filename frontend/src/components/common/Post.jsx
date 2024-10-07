@@ -3,6 +3,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { BiShareAlt } from "react-icons/bi";
+import AdComponent from "../../components/common/AdComponent";
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -31,22 +32,6 @@ const ShareButton = styled.div`
   font-size: 32px; /* Adjust icon size */
   cursor: pointer;
 `;
-
-const AdComponent = () => (
-	<div className="my-4">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6561467807135376"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block; text-align:center;"
-     data-ad-layout="in-article"
-     data-ad-format="fluid"
-     data-ad-client="ca-pub-6561467807135376"
-     data-ad-slot="7561831875"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
-</div>
-);
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
@@ -237,9 +222,6 @@ const Post = ({ post }) => {
                             />
                         )}
                     </Link>
-					{/* Insert AdComponent randomly between posts */}
-					  {index % 5 === 0 && <AdComponent />}
-
 					<div className='flex justify-between mt-3'>
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
 							<div
@@ -333,6 +315,8 @@ const Post = ({ post }) => {
 				
 			</div>
 
+			{/* Insert AdComponent after every 5 posts */}
+			{index > 0 && index % 5 === 0 && <AdComponent />}
 			{/* Modal for image magnification */}
 			{isImageModalOpen && (
 				<div

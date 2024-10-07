@@ -3,22 +3,8 @@ import Posts from "../../components/common/Posts";
 import CreatePost from "./CreatePost";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import AdComponent from "../../components/common/AdComponent";
 
-const AdComponent = () => (
-	<div className="my-4">
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6561467807135376"
-           crossorigin="anonymous"></script>
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-6561467807135376"
-           data-ad-slot="4124298712"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-);
 const HomePage = () => {
 	const [feedType, setFeedType] = useState("forYou");
 
@@ -59,8 +45,7 @@ const HomePage = () => {
 						)}
 					</div>
 				</div>
-
-			    {/* Ad Component */}
+				{/* Insert AdComponent Above CreatePost */}
 				<AdComponent />
 
 				{/* CREATE POST INPUT, only show if authenticated */}
