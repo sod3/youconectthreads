@@ -4,16 +4,15 @@ import { useRef, useState } from "react";
 import { IoCloseSharp } from "react-icons/io5";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
-import Picker from '@emoji-mart/react'; // Updated import
-// Removed: import 'emoji-mart/css/emoji-mart.css';
+import Picker from '@emoji-mart/react';
 
 const CreatePost = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [text, setText] = useState("");
   const [img, setImg] = useState(null);
   const imgRef = useRef(null);
-
-  const maxCharacters = 280; // Example character limit
+  
+  const maxCharacters = 500; // Updated character limit
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
@@ -81,6 +80,7 @@ const CreatePost = () => {
     const newText =
       text.slice(0, cursorPosition) + emoji.native + text.slice(cursorPosition);
     setText(newText);
+    setShowEmojiPicker(false); // Optional: Close picker after selection
   };
 
   return (
@@ -103,10 +103,10 @@ const CreatePost = () => {
           rows={3}
         />
         <div className='flex justify-between items-center'>
-          <span className={`text-sm ${text.length > maxCharacters ? 'text-red-500' : 'text-gray-500'}`}>
+          <span className={`text-sm ${text.length > maxCharacters ? 'text-red-500' : 'text-white'}`}>
             {text.length}/{maxCharacters}
           </span>
-          {/* Add character count and prevent exceeding max characters */}
+          {/* Character count with updated color */}
         </div>
         {img && (
           <div className='relative w-72 mx-auto'>
