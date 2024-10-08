@@ -12,7 +12,7 @@ const CreatePost = () => {
   const [img, setImg] = useState(null);
   const imgRef = useRef(null);
   
-  const maxCharacters = 500; // Updated character limit
+  const maxCharacters = 1500; // Updated character limit
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();

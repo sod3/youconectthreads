@@ -1,6 +1,16 @@
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardMedia, Typography, Avatar, IconButton, Box, Button, Grid2, TextField } from '@mui/material';
+import { 
+  Card, 
+  CardContent, 
+  CardMedia, 
+  Typography, 
+  Avatar, 
+  IconButton, 
+  Box, 
+  Button, 
+  TextField 
+} from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
 import { BiShareAlt } from "react-icons/bi";
@@ -59,7 +69,6 @@ const PostDetail = () => {
     }
   });
 
-
   // Mutation for liking a post
   const likeMutation = useMutation({
     mutationFn: async () => {
@@ -69,6 +78,7 @@ const PostDetail = () => {
       if (!res.ok) {
         throw new Error('Failed to like post');
       }
+      return res.json();
     },
     onSuccess: () => {
       // Refetch the post data after like mutation
@@ -89,6 +99,7 @@ const PostDetail = () => {
       if (!res.ok) {
         throw new Error('Failed to add comment');
       }
+      return res.json();
     },
     onSuccess: () => {
       // Refetch post data after comment is added
@@ -109,10 +120,11 @@ const PostDetail = () => {
     }
   };
 
-    // Handle post share
-    const handleSharePost = () => {
-      setShowShareModal(!showShareModal); // Toggle share modal visibility
-    };
+  // Handle post share
+  const handleSharePost = () => {
+    setShowShareModal(!showShareModal); // Toggle share modal visibility
+  };
+
   if (isLoading || relatedLoading) {
     return <div>Loading...</div>;
   }
@@ -120,9 +132,10 @@ const PostDetail = () => {
   if (error || relatedError) {
     return <div>{error?.message || relatedError?.message}</div>;
   }
-	const getFirstTenLetters = (text) => {
-		return text.slice(0, 10) + (text.length > 10 ? "..." : "");
-	  };
+
+  const getFirstTenLetters = (text) => {
+    return text.slice(0, 10) + (text.length > 10 ? "..." : "");
+  };
   const postUrl = `https://youconect.com/posts/${post._id}`;
   const currentUrl = window.location.href;
 
@@ -133,10 +146,14 @@ const PostDetail = () => {
         <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
           <div className='avatar'>
             <Link to={`/profile/${post.user.username}`} className='w-12 rounded-full overflow-hidden'>
-              <img src={post.user.profileImg || "/avatar-placeholder.png"} className='w-full h-full object-cover' />
+              <img 
+                src={post.user.profileImg || "/avatar-placeholder.png"} 
+                className='w-full h-full object-cover' 
+                alt={`${post.user.fullName}'s avatar`} 
+              />
             </Link>
           </div>
-          <Box>
+          <Box sx={{ marginLeft: '10px' }}>
             <Typography variant="h6">{post.user.fullName}</Typography>
             <Typography variant="body2" color="textSecondary">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
@@ -159,7 +176,10 @@ const PostDetail = () => {
           />
         )}
         <CardContent>
-          <Typography variant="body1" sx={{ marginBottom: '20px' }}>
+          <Typography 
+            variant="body1" 
+            sx={{ marginBottom: '20px', whiteSpace: 'pre-wrap' }}
+          >
             {post.text}
           </Typography>
         </CardContent>
@@ -167,72 +187,101 @@ const PostDetail = () => {
         {/* Post Interactions */}
         <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
-            <IconButton color="primary" onClick={handleLike} disabled={likeMutation.isLoading}>
-              <ThumbUpIcon /> <Typography sx={{ marginLeft: '8px' }}>{post.likes.length} Likes</Typography>
+            <IconButton 
+              color="primary" 
+              onClick={handleLike} 
+              disabled={likeMutation.isLoading}
+            >
+              <ThumbUpIcon /> 
+              <Typography sx={{ marginLeft: '8px' }}>
+                {post.likes.length} Likes
+              </Typography>
             </IconButton>
             <IconButton color="primary">
-              <CommentIcon /> <Typography sx={{ marginLeft: '8px' }}>{post.comments.length} Comments</Typography>
+              <CommentIcon /> 
+              <Typography sx={{ marginLeft: '8px' }}>
+                {post.comments.length} Comments
+              </Typography>
             </IconButton>
             <IconButton color="primary" onClick={handleSharePost}>
-            <BiShareAlt /> <Typography sx={{ marginLeft: '8px' }}>Share</Typography>
+              <BiShareAlt /> 
+              <Typography sx={{ marginLeft: '8px' }}>Share</Typography>
             </IconButton>
           </Box>
         </CardContent>
 
         {/* Share Modal */}
         {showShareModal && (
-            <div className='fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50'>
-                <div className='bg-white p-4 rounded shadow-lg'>
-                    <h3 className='font-bold text-lg mb-4'>Share this post</h3>
-                    <IconContainer>
-             <ShareButton>
-               <WhatsappShareButton
-                 url={postUrl}
-                 title={getFirstTenLetters(post.text)}
-                 separator=":: "
-               >
-                 <WhatsappIcon size={32} round={true} />
-               </WhatsappShareButton>
-             </ShareButton>
-           
-             <ShareButton>
-               <FacebookShareButton
-                 url={postUrl}
-                 quote={getFirstTenLetters(post.text)}
-                 hashtag="#YouConect"
-               >
-                 <FacebookIcon size={32} round={true} />
-               </FacebookShareButton>
-             </ShareButton>
-           
-             <ShareButton>
-               <TwitterShareButton
-                 url={currentUrl}
-                 title={getFirstTenLetters(post.text)}
-               >
-                 <TwitterIcon size={32} round={true} />
-               </TwitterShareButton>
-             </ShareButton>
-           </IconContainer>
-                    <button className='mt-4 px-4 py-2 bg-blue-500 text-white rounded' onClick={handleSharePost}>
-                        Close
-                    </button>
-                </div>
+          <div className='fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50'>
+            <div className='bg-white p-4 rounded shadow-lg'>
+              <h3 className='font-bold text-lg mb-4'>Share this post</h3>
+              <IconContainer>
+                <ShareButton>
+                  <WhatsappShareButton
+                    url={postUrl}
+                    title={getFirstTenLetters(post.text)}
+                    separator=":: "
+                  >
+                    <WhatsappIcon size={32} round={true} />
+                  </WhatsappShareButton>
+                </ShareButton>
+                <ShareButton>
+                  <FacebookShareButton
+                    url={postUrl}
+                    quote={getFirstTenLetters(post.text)}
+                    hashtag="#YouConect"
+                  >
+                    <FacebookIcon size={32} round={true} />
+                  </FacebookShareButton>
+                </ShareButton>
+                <ShareButton>
+                  <TwitterShareButton
+                    url={currentUrl}
+                    title={getFirstTenLetters(post.text)}
+                  >
+                    <TwitterIcon size={32} round={true} />
+                  </TwitterShareButton>
+                </ShareButton>
+              </IconContainer>
+              <button 
+                className='mt-4 px-4 py-2 bg-blue-500 text-white rounded' 
+                onClick={handleSharePost}
+              >
+                Close
+              </button>
             </div>
+          </div>
         )}
 
         {/* Comments Section */}
         <CardContent>
           <Typography variant="h6" sx={{ marginBottom: '10px' }}>Comments</Typography>
           {post.comments.length === 0 ? (
-            <Typography variant="body2" color="textSecondary">No comments yet. Be the first to comment!</Typography>
+            <Typography variant="body2" color="textSecondary">
+              No comments yet. Be the first to comment!
+            </Typography>
           ) : (
             post.comments.map((comment) => (
-              <Box key={comment.id} sx={{ display: 'flex', alignItems: 'flex-start', marginBottom: '15px' }}>
-                <Avatar src={comment.user.profileImage} alt={comment.user.fullName} sx={{ marginRight: '10px' }} />
+              <Box 
+                key={comment._id} 
+                sx={{ display: 'flex', alignItems: 'flex-start', marginBottom: '15px' }}
+              >
+                <Avatar 
+                  src={comment.user.profileImg || "/avatar-placeholder.png"} 
+                  alt={comment.user.fullName} 
+                  sx={{ marginRight: '10px' }} 
+                />
                 <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{comment.user.fullName}</Typography>
-                  <Typography variant="body2" color="textSecondary">{comment.text}</Typography>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    {comment.user.fullName}
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="textSecondary" 
+                    sx={{ whiteSpace: 'pre-wrap' }} // Preserve line breaks in comments
+                  >
+                    {comment.text}
+                  </Typography>
                 </Box>
               </Box>
             ))
@@ -262,50 +311,76 @@ const PostDetail = () => {
         </CardContent>
       </Card>
 
-
-{/* Related Posts Section */}
-<Card sx={{ marginTop: '20px', boxShadow: 3, borderRadius: 2 }}>
-  <CardContent>
-    <Typography 
-      variant="h6" 
-      sx={{ 
-        marginBottom: '10px', 
-        fontWeight: 'bold',   // Makes the text bold
-        textAlign: 'center'   // Centers the text
-      }}
-    >
-      Related Posts
-    </Typography>
-    {relatedPosts && relatedPosts.length > 0 ? (
-      relatedPosts.map((relatedPost) => (
-        <Link key={relatedPost._id} to={`/posts/${relatedPost._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-          <Card sx={{ marginBottom: '50px', boxShadow: 1 }}>
-            <CardContent sx={{ display: 'flex', alignItems: 'center', }}>
-              <div className='avatar'>
-                <Link to={`/profile/${relatedPost.user.username}`} className='w-12 rounded-full overflow-hidden'>
-                  <img src={relatedPost.user.profileImg || "/avatar-placeholder.png"} className='w-full h-full object-cover' />
-                </Link>
-              </div>
-              <Box>
-                <Typography variant="h6">{relatedPost.user.username}</Typography>
-                <Typography variant="body2" color="textSecondary">{relatedPost.user.username}</Typography>
-              </Box>
-            </CardContent>
-            {relatedPost.img && (
-              <CardMedia component="img" image={relatedPost.img} alt="Related Post Image" sx={{ maxHeight: 700, objectFit: 'scale-down' }} />
-            )}
-            <CardContent>
-              <Typography variant="body1">{relatedPost.text}</Typography>
-            </CardContent>
-          </Card>
-        </Link>
-      ))
-    ) : (
-      <Typography variant="body2" color="textSecondary">No related posts found.</Typography>
-    )}
-  </CardContent>
-</Card>
+      {/* Related Posts Section */}
+      <Card sx={{ marginTop: '20px', boxShadow: 3, borderRadius: 2 }}>
+        <CardContent>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              marginBottom: '10px', 
+              fontWeight: 'bold',   // Makes the text bold
+              textAlign: 'center'   // Centers the text
+            }}
+          >
+            Related Posts
+          </Typography>
+          {relatedPosts && relatedPosts.length > 0 ? (
+            relatedPosts.map((relatedPost) => (
+              <Link 
+                key={relatedPost._id} 
+                to={`/posts/${relatedPost._id}`} 
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <Card sx={{ marginBottom: '50px', boxShadow: 1 }}>
+                  <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                    <div className='avatar'>
+                      <Link to={`/profile/${relatedPost.user.username}`} className='w-12 rounded-full overflow-hidden'>
+                        <img 
+                          src={relatedPost.user.profileImg || "/avatar-placeholder.png"} 
+                          className='w-full h-full object-cover' 
+                          alt={`${relatedPost.user.fullName}'s avatar`} 
+                        />
+                      </Link>
+                    </div>
+                    <Box sx={{ marginLeft: '10px' }}>
+                      <Typography variant="h6">{relatedPost.user.fullName}</Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        @{relatedPost.user.username}
+                      </Typography>
+                    </Box>
+                  </CardContent>
+                  {relatedPost.img && (
+                    <CardMedia 
+                      component="img" 
+                      image={relatedPost.img} 
+                      alt="Related Post Image" 
+                      sx={{ 
+                        maxHeight: 700, 
+                        objectFit: 'scale-down', 
+                        objectPosition: 'center' 
+                      }} 
+                    />
+                  )}
+                  <CardContent>
+                    <Typography 
+                      variant="body1" 
+                      sx={{ whiteSpace: 'pre-wrap' }} // Preserve line breaks in related posts
+                    >
+                      {relatedPost.text}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          ) : (
+            <Typography variant="body2" color="textSecondary">
+              No related posts found.
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
     </Box>
   );
 };
+
 export default PostDetail;

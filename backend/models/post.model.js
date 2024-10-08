@@ -10,9 +10,7 @@ const postSchema = new mongoose.Schema(
 		text: {
 			type: String,
 		},
-		img: {
-			type: String,
-		},
+		img: { type: String, default: null }, // Make img nullable
 		likes: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
