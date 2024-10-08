@@ -211,16 +211,16 @@ const Post = ({ post, index }) => {
 						)}
 					</div>
                     {/* Wrap post text and image in a Link to navigate to the PostDetail page */}
-                    <Link to={`/posts/${post._id}`} className="flex flex-col gap-3 overflow-hidden">
-                        <span>{post.text}</span>
-                        {post.img && (
-                            <img
-                                src={post.img}
-                                className='h-80 object-contain rounded-lg border border-gray-700 cursor-pointer'
-                                alt='Post Image'
-                                onClick={() => handleImageClick(post.img)} // Add click handler for modal image
-                            />
-                        )}
+					<Link to={`/posts/${post._id}`} className="flex flex-col gap-3 overflow-hidden">
+                    <div className="whitespace-pre-wrap text-lg mt-2">{post.text}</div>
+                    {post.img && (
+                      <img
+                        src={post.img}
+                        className='h-80 object-contain rounded-lg border border-gray-700 cursor-pointer'
+                        alt='Post Image'
+                        onClick={() => handleImageClick(post.img)} // Add click handler for modal image
+                      />
+                     )}
                     </Link>
 					<div className='flex justify-between mt-3'>
 						<div className='flex gap-4 items-center w-2/3 justify-between'>
