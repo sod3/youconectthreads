@@ -2,38 +2,73 @@ import Notification from "../models/notification.model.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import multer from 'multer';
+
+const upload = multer({ storage: multer.memoryStorage() });
+export const uploadMiddleware = upload.single('file');
 
 export const createPost = async (req, res) => {
 	try {
-		const { text } = req.body;
-		let { img } = req.body;
-		const userId = req.user._id.toString();
-
-		const user = await User.findById(userId);
-		if (!user) return res.status(404).json({ message: "User not found" });
-
-		if (!text && !img) {
-			return res.status(400).json({ error: "Post must have text or image" });
-		}
-
-		if (img) {
-			const uploadedResponse = await cloudinary.uploader.upload(img);
-			img = uploadedResponse.secure_url;
-		}
-
-		const newPost = new Post({
-			user: userId,
-			text,
-			img,
+	  const { text, video } = req.body;
+	  console.log('Received video URL:', video); // Add this line to check if video URL is received
+	  const userId = req.user._id.toString();
+	  
+	  const user = await User.findById(userId);
+	  if (!user) return res.status(404).json({ message: "User not found" });
+  
+	  // Check if at least one of text, image, or video exists
+	  if (!text && !req.file && !video) {
+		return res.status(400).json({ error: "Post must have text, image, or video" });
+	  }
+  
+	  let imgUrl = null;
+	  let videoUrl = null;
+  
+	  // Handle image upload using multer (if image file is uploaded)
+	  if (req.file) {
+		const buffer = req.file.buffer;
+		const base64Image = buffer.toString('base64');
+		const dataUri = `data:${req.file.mimetype};base64,${base64Image}`;
+		
+		// Upload image to Cloudinary
+		const uploadedResponse = await cloudinary.uploader.upload(dataUri, {
+		  folder: 'posts',
 		});
-
-		await newPost.save();
-		res.status(201).json(newPost);
+		imgUrl = uploadedResponse.secure_url; // Save the image URL
+	  }
+  
+	  // Handle video URL (Firebase video URL passed from frontend)
+	  if (video) {
+		const isValidUrl = (string) => {
+		  try {
+			new URL(string);
+			return true;
+		  } catch {
+			return false;
+		  }
+		};
+		
+		if (!isValidUrl(video)) {
+		  return res.status(400).json({ error: "Invalid video URL" });
+		}
+		videoUrl = video; // Use the video URL from the frontend
+	  }
+  
+	  // Create a new post
+	  const newPost = new Post({
+		user: userId,
+		text,
+		img: imgUrl,     // Store image URL if uploaded
+		video: videoUrl,  // Store video URL if provided
+	  });
+  
+	  await newPost.save();
+	  res.status(201).json(newPost);
 	} catch (error) {
-		res.status(500).json({ error: "Internal server error" });
-		console.log("Error in createPost controller: ", error);
+	  console.error("Error in createPost controller: ", error);
+	  res.status(500).json({ error: "Internal server error" });
 	}
-};
+  };  
 
 export const deletePost = async (req, res) => {
 	try {
@@ -266,27 +301,18 @@ export const getPostById = async (req, res) => {
   
 	  let relatedPosts = [];
   
-	  // Find related posts based on tags if available
-	  if (currentPost.tags && currentPost.tags.length > 0) {
-		relatedPosts = await Post.find({
-		  _id: { $ne: currentPost._id }, // Exclude the current post
-		  tags: { $in: currentPost.tags }, // Match posts that share tags
-		})
-		  .limit(5)
-		  .populate('user', 'username profileImg');
-	  }
+	  // Since tags are not defined, skip related posts based on tags
+	  // Instead, you can define other criteria for relatedness or fetch random posts
   
-	  // If no related posts found, fetch random posts as a fallback
-	  if (relatedPosts.length === 0) {
-		relatedPosts = await Post.aggregate([
-		  { $match: { _id: { $ne: currentPost._id } } }, // Exclude the current post
-		  { $sample: { size: 5 } }, // Get 5 random posts
-		]);
-		
-		// Populate random posts with user data
-		for (let post of relatedPosts) {
-		  post.user = await User.findById(post.user).select('username profileImg');
-		}
+	  // Example: Fetch random posts excluding the current one
+	  relatedPosts = await Post.aggregate([
+		{ $match: { _id: { $ne: currentPost._id } } }, // Exclude the current post
+		{ $sample: { size: 5 } }, // Get 5 random posts
+	  ]);
+  
+	  // Populate random posts with user data
+	  for (let post of relatedPosts) {
+		post.user = await User.findById(post.user).select('username profileImg fullName');
 	  }
   
 	  res.status(200).json(relatedPosts);
