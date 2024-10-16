@@ -188,34 +188,37 @@ const CreatePost = () => {
             />
           </div>
         )}
-        <div className="flex justify-between border-t py-2 border-gray-700">
-          <div className="flex gap-4 items-center relative">
+       <div className="flex justify-between items-center border-t py-2 border-gray-700">
+          <div className="flex gap-6 items-center relative">
+            <BsEmojiSmileFill
+              className="fill-primary w-7 h-7 cursor-pointer hover:opacity-80 transition-transform transform hover:scale-110"
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              title="Add Emoji"
+              aria-label="Add Emoji"
+            />
             <CiImageOn
-              className="fill-primary w-6 h-6 cursor-pointer hover:opacity-80 transition"
+              className="fill-primary w-8 h-8 cursor-pointer hover:opacity-80 transition-transform transform hover:scale-110"
               onClick={() => imgRef.current.click()}
               title="Add Image"
+              aria-label="Add Image"
             />
             <CiVideoOn
-              className="fill-primary w-6 h-6 cursor-pointer hover:opacity-80 transition"
+              className="fill-primary w-8 h-8 cursor-pointer hover:opacity-80 transition-transform transform hover:scale-110"
               onClick={() => videoRef.current.click()}
               title="Add Video"
+              aria-label="Add Video"
             />
-            {/* Emoji Picker Toggle and Positioning */}
-            <div className="relative">
-              <BsEmojiSmileFill
-                className="fill-primary w-5 h-5 cursor-pointer hover:opacity-80 transition"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                title="Add Emoji"
-              />
-
               {showEmojiPicker && (
                 <div
                   className="absolute z-50 bg-white border rounded shadow"
                   style={{
                     top: "40px", // Ensure this value is enough to display below the icon
-                    left: "calc(50% - 30px)", // Center the picker
+                    left: "calc(50% - 70px)", // Center the picker
                     transform: "translateX(0)",
                     width: "300px",
+                    "@media (max-width: 430px)": {
+                      width: "200px",
+                    },
                     maxWidth: "100%",
                   }}
                 >
@@ -232,8 +235,6 @@ const CreatePost = () => {
                 </div>
               )}
             </div>
-          </div>
-
           <input
             type="file"
             accept="image/*"
@@ -260,5 +261,4 @@ const CreatePost = () => {
     </div>
   );
 };
-
 export default CreatePost;

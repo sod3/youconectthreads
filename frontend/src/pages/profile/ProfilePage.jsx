@@ -21,6 +21,7 @@ const ProfilePage = () => {
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
@@ -73,6 +74,34 @@ const ProfilePage = () => {
 		refetch();
 	}, [username, refetch]);
 
+const ImageModal = ({ imageUrl, onClose, isFollowing, onConect, isMyProfile }) => {
+	return (
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+			<div className="relative p-4 bg-white rounded-full shadow-lg flex flex-col items-center">
+				<img
+					src={imageUrl}
+					className="w-40 h-40 rounded-full object-cover transition-all duration-300 ease-in-out"
+					alt="Profile"
+				/>
+				{/* Show "Conect" button only if it's not the user's own profile and they are not already following */}
+				{!isMyProfile && !isFollowing && (
+					<button
+						onClick={onConect}
+						className="mt-4 py-2 px-6 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-all"
+					>
+						Conect
+					</button>
+				)}
+				<button
+					className="absolute top-2 right-2 text-white bg-red-600 rounded-full p-2"
+					onClick={onClose}
+				>
+					X
+				</button>
+			</div>
+		</div>
+	);
+};
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
@@ -122,13 +151,18 @@ const ProfilePage = () => {
 									onChange={(e) => handleImgChange(e, "profileImg")}
 								/>
 								{/* USER AVATAR */}
-								<div className='avatar absolute -bottom-16 left-4'>
-									<div className='w-32 rounded-full relative group/avatar'>
-										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
-										<div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
+								<div className="avatar absolute -bottom-16 left-4">
+									<div className="w-32 rounded-full relative group/avatar cursor-pointer">
+										<img
+											src={profileImg || user?.profileImg || "/avatar-placeholder.png"}
+											onClick={() => setIsModalOpen(true)} // Open modal on click
+											className="rounded-full object-cover"
+											alt="Profile"
+										/>
+										<div className="absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer">
 											{isMyProfile && (
 												<MdEdit
-													className='w-4 h-4 text-white'
+													className="w-4 h-4 text-white"
 													onClick={() => profileImgRef.current.click()}
 												/>
 											)}
@@ -175,12 +209,11 @@ const ProfilePage = () => {
 											<>
 												<FaLink className='w-3 h-3 text-slate-500' />
 												<a
-													href='https://youtube.com/@asaprogrammer_'
+													href='https://youconect.com/@YouConect_'
 													target='_blank'
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
 												>
-													{/* Updated this after recording the video. I forgot to update this while recording, sorry, thx. */}
 													{user?.link}
 												</a>
 											</>
@@ -199,6 +232,7 @@ const ProfilePage = () => {
 									<div className='flex gap-1 items-center'>
 										<span className='font-bold text-xs'>{user?.followers.length}</span>
 										<span className='text-slate-500 text-xs'>Conecters</span>
+										{/* <span className='text-sm font-large text-slate-500'>Conecters</span>*/}
 									</div>
 								</div>
 							</div>
@@ -228,6 +262,17 @@ const ProfilePage = () => {
 					<Posts feedType={feedType} username={username} userId={user?._id} />
 				</div>
 			</div>
+
+			{/* Modal to display enlarged profile image */}
+			{isModalOpen && (
+				<ImageModal
+					imageUrl={profileImg || user?.profileImg || "/avatar-placeholder.png"}
+					onClose={() => setIsModalOpen(false)}
+					isFollowing={amIFollowing} // Pass following status to ImageModal
+					onConect={() => follow(user?._id)} // Pass follow function to ImageModal
+					isMyProfile={isMyProfile} // Pass isMyProfile to ImageModal
+				/>
+			)}
 		</>
 	);
 };

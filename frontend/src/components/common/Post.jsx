@@ -1,9 +1,13 @@
 // Post.jsx
-import { FaRegComment, FaRegHeart, FaRegBookmark, FaTrash } from "react-icons/fa";
+import React, { useState, memo, useCallback } from "react";
+import {
+  FaRegComment,
+  FaRegHeart,
+  FaRegBookmark,
+  FaTrash,
+} from "react-icons/fa";
 import { BiShareAlt } from "react-icons/bi";
 import AdComponent from "../../components/common/AdComponent";
-
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -18,35 +22,32 @@ import {
   TwitterIcon,
 } from "react-share";
 import styled from "styled-components";
+import LazyLoad from "react-lazyload";
 
 const IconContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 10px 0; /* Space around the icons */
+  margin: 10px 0;
 `;
 
 const ShareButton = styled.div`
-  margin-right: 15px; /* Increase space between buttons */
-  font-size: 32px; /* Adjust icon size */
+  margin-right: 15px;
+  font-size: 32px;
   cursor: pointer;
 `;
 
-const Post = ({ post, index }) => {
+const Post = memo(({ post, index }) => {
   const [comment, setComment] = useState("");
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
-  const [showShareModal, setShowShareModal] = useState(false); // State to toggle share modal
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
   const postOwner = post.user;
 
-  // Only check if liked if authUser is defined
   const isLiked = authUser ? post.likes.includes(authUser._id) : false;
-
-  // Check if it's my post only if authUser is defined
   const isMyPost = authUser ? authUser._id === post.user._id : false;
-
   const formattedDate = formatPostDate(post.createdAt);
 
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
@@ -61,12 +62,15 @@ const Post = ({ post, index }) => {
         }
         return data;
       } catch (error) {
-        throw new Error(error);
+        throw new Error(error.message || "Something went wrong");
       }
     },
     onSuccess: () => {
       toast.success("Post deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -82,7 +86,7 @@ const Post = ({ post, index }) => {
         }
         return data;
       } catch (error) {
-        throw new Error(error);
+        throw new Error(error.message || "Something went wrong");
       }
     },
     onSuccess: (updatedLikes) => {
@@ -117,7 +121,7 @@ const Post = ({ post, index }) => {
         }
         return data;
       } catch (error) {
-        throw new Error(error);
+        throw new Error(error.message || "Something went wrong");
       }
     },
     onSuccess: () => {
@@ -130,46 +134,48 @@ const Post = ({ post, index }) => {
     },
   });
 
-  const handleDeletePost = () => {
+  const handleDeletePost = useCallback(() => {
     if (!authUser) {
       toast.error("You need to be logged in to delete posts.");
       return;
     }
     deletePost();
-  };
+  }, [authUser, deletePost]);
 
-  const handlePostComment = (e) => {
-    e.preventDefault();
-    if (!authUser) {
-      toast.error("You need to be logged in to comment.");
-      return;
-    }
-    if (isCommenting) return;
-    commentPost();
-  };
+  const handlePostComment = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (!authUser) {
+        toast.error("You need to be logged in to comment.");
+        return;
+      }
+      if (isCommenting) return;
+      commentPost();
+    },
+    [authUser, isCommenting, commentPost]
+  );
 
-  const handleLikePost = () => {
+  const handleLikePost = useCallback(() => {
     if (!authUser) {
       toast.error("You need to be logged in to like posts.");
       return;
     }
     if (isLiking) return;
     likePost();
-  };
+  }, [authUser, isLiking, likePost]);
 
   const handleImageClick = (imgSrc) => {
     setSelectedImage(imgSrc);
     setIsImageModalOpen(true);
   };
 
-  // Handle modal close
   const closeModal = () => {
     setIsImageModalOpen(false);
     setSelectedImage("");
   };
 
   const handleSharePost = () => {
-    setShowShareModal(!showShareModal); // Toggle share modal visibility
+    setShowShareModal(!showShareModal);
   };
 
   const getFirstTenLetters = (text) => {
@@ -216,7 +222,7 @@ const Post = ({ post, index }) => {
             )}
           </div>
 
-          {/* Display post content */}
+          {/* Post Content */}
           <Link
             to={`/posts/${post._id}`}
             className="flex flex-col gap-3 overflow-hidden"
@@ -224,26 +230,45 @@ const Post = ({ post, index }) => {
             {/* Post Text */}
             <div className="whitespace-pre-wrap text-lg mt-2">{post.text}</div>
 
-            {/* Display image if available */}
+            {/* Lazy Load Image if available */}
             {post.img && (
-              <img
-                src={post.img}
-                className="h-80 object-contain rounded-lg border border-gray-700 cursor-pointer"
-                alt="Post Image"
-                onClick={() => handleImageClick(post.img)}
-              />
+              <LazyLoad
+                height={320}
+                offset={100}
+                once
+                placeholder={<LoadingSpinner />}
+              >
+                <img
+                  src={post.img}
+                  className="h-80 object-contain rounded-lg border border-gray-700 cursor-pointer"
+                  alt="Post Image"
+                  onClick={() => handleImageClick(post.img)}
+                />
+              </LazyLoad>
             )}
 
-            {/* Display video if available */}
+            {/* Lazy Load Video if available */}
             {post.video && (
-              <video
-                className="h-80 object-contain rounded-lg border border-gray-700"
-                controls
-                preload="metadata"
+              <LazyLoad
+                height={320}
+                offset={100}
+                once
+                placeholder={<LoadingSpinner />}
               >
-                <source src={post.video} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              <video
+                className={
+                  window.innerWidth > 1058
+                    ? "h-83 object-contain rounded-lg border border-gray-700"
+                    : "h-95 object-contain rounded-lg border border-gray-700"
+                }
+                  controls
+                  preload="metadata"
+                  poster={post.thumbnail} // Ensure you have a thumbnail image
+                >
+                  <source src={post.video} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </LazyLoad>
             )}
           </Link>
 
@@ -301,10 +326,7 @@ const Post = ({ post, index }) => {
         </div>
       </div>
 
-      {/* Insert AdComponent after every 5 posts */}
-      {index > 0 && index % 5 === 0 && <AdComponent />}
-
-      {/* Image modal for zooming */}
+      {/* Image Modal for Zooming */}
       {isImageModalOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
@@ -363,7 +385,7 @@ const Post = ({ post, index }) => {
             </IconContainer>
             <button
               className="mt-4 text-red-600"
-              onClick={handleSharePost} // Close share modal
+              onClick={handleSharePost}
             >
               Close
             </button>
@@ -424,6 +446,6 @@ const Post = ({ post, index }) => {
       </dialog>
     </>
   );
-};
+});
 
 export default Post;
